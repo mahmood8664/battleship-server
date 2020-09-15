@@ -1,0 +1,5 @@
+port: 8080
+logging:
+  level: debug
+  path: /tmp/data
+  file_name: battleship.log
