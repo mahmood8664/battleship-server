@@ -1,5 +1,11 @@
-port: 8080
+mode: dev
+http_port: 8080
+socket_port: 8090
 logging:
   level: debug
   path: /tmp/data
   file_name: battleship.log
+mongodb:
+  url: mongodb://localhost:27017
+  username:
+  password:

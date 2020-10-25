@@ -7,11 +7,43 @@ package di
 
 import (
 	"battleship/controllers"
+	"battleship/db/dao"
+	"battleship/service"
 )
 
 // Injectors from wire.go:
 
-func CreateCheckHealthController() *controllers.CheckHealthController {
-	checkHealthController := controllers.NewCheckHealthController()
-	return checkHealthController
+func CreateGameController() controllers.GameController {
+	gameService := CreateGameService()
+	gameControllerImpl := controllers.NewGameControllerImpl(gameService)
+	return gameControllerImpl
+}
+
+func CreateUserController() controllers.UserController {
+	userService := CreateUserService()
+	userControllerImpl := controllers.NewUserController(userService)
+	return userControllerImpl
+}
+
+func CreateGameService() service.GameService {
+	gameDao := CreateGameDao()
+	userDao := CreateUserDao()
+	gameServiceImpl := service.NewGameServiceImpl(gameDao, userDao)
+	return gameServiceImpl
+}
+
+func CreateUserService() service.UserService {
+	userDao := CreateUserDao()
+	userServiceImpl := service.NewUserServiceImpl(userDao)
+	return userServiceImpl
+}
+
+func CreateGameDao() dao.GameDao {
+	gameDaoImpl := dao.NewGameDaoImpl()
+	return gameDaoImpl
+}
+
+func CreateUserDao() dao.UserDao {
+	userDaoImpl := dao.NewUserDaoImpl()
+	return userDaoImpl
 }

@@ -1,0 +1,213 @@
+definitions:
+  dto.CreateGameRequest:
+    properties:
+      user_id:
+        type: string
+    type: object
+  dto.CreateGameResponse:
+    properties:
+      game_id:
+        type: string
+    type: object
+  dto.CreateUserRequest:
+    properties:
+      mobile:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.CreateUserResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  dto.GameDto:
+    properties:
+      create_date:
+        type: string
+      id:
+        type: string
+      last_move_time:
+        type: string
+      move_timeout_sec:
+        type: integer
+      side_1_user_id:
+        type: string
+      side_2_user_id:
+        type: string
+      state:
+        $ref: '#/definitions/dto.GameState'
+        type: object
+      status:
+        type: string
+      turn:
+        type: integer
+      winner:
+        type: string
+    type: object
+  dto.GameState:
+    properties:
+      side_1:
+        additionalProperties:
+          type: boolean
+        description: map index -> is hidden
+        type: object
+      side_1_ships:
+        additionalProperties:
+          type: boolean
+        description: map index -> is ship exist
+        type: object
+      side_2:
+        additionalProperties:
+          type: boolean
+        description: map index -> is hidden
+        type: object
+      side_2_ships:
+        additionalProperties:
+          type: boolean
+        description: map index -> is ship exist
+        type: object
+    type: object
+  dto.JoinGameRequest:
+    properties:
+      game_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  dto.JoinGameResponse:
+    properties:
+      game:
+        $ref: '#/definitions/dto.GameDto'
+        type: object
+    type: object
+  dto.UserDto:
+    properties:
+      id:
+        type: string
+      mobile:
+        type: string
+      name:
+        type: string
+    type: object
+info:
+  contact:
+    email: m.allamehamiri@gmail.com
+    name: Mahmoud AllamehAmiri
+  description: Battleship API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Battleship API
+  version: "1.0"
+paths:
+  /api/v1/game:
+    post:
+      consumes:
+      - application/json
+      description: create a new battleship game instance
+      parameters:
+      - description: Create Game Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateGameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Game successfully created
+          schema:
+            $ref: '#/definitions/dto.CreateGameResponse'
+      summary: Create game
+      tags:
+      - Game
+  /api/v1/game/{game_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get game info
+      parameters:
+      - description: ' '
+        in: path
+        name: game_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Game successfully created
+          schema:
+            $ref: '#/definitions/dto.GameDto'
+      summary: Get game
+      tags:
+      - Game
+  /api/v1/game/join:
+    post:
+      consumes:
+      - application/json
+      description: Join to a battleship game instance
+      parameters:
+      - description: Join Game Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.JoinGameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Join Game successfully
+          schema:
+            $ref: '#/definitions/dto.JoinGameResponse'
+      summary: Join game
+      tags:
+      - Game
+  /api/v1/user:
+    post:
+      consumes:
+      - application/json
+      description: create a new user
+      parameters:
+      - description: Create User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully created
+          schema:
+            $ref: '#/definitions/dto.CreateUserResponse'
+      summary: Create user
+      tags:
+      - User
+  /api/v1/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get user info
+      parameters:
+      - description: ' '
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Game successfully created
+          schema:
+            $ref: '#/definitions/dto.UserDto'
+      summary: Get user
+      tags:
+      - User
+swagger: "2.0"

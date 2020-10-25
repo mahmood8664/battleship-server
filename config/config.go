@@ -2,9 +2,12 @@ package config
 
 import (
 	"github.com/mitchellh/mapstructure"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
+	"os"
 	"strings"
+	"time"
 )
 
 var (
@@ -13,8 +16,11 @@ var (
 )
 
 type Config struct {
-	Port    string  `yaml:"port"`
-	Logging Logging `yaml:"logging"`
+	Mode       string  `yaml:"mode"`
+	HttpPort   string  `yaml:"http_port"`
+	SocketPort string  `yaml:"socket_port"`
+	Logging    Logging `yaml:"logging"`
+	MongoDB    Mongodb `yaml:"mongodb"`
 }
 
 type Logging struct {
@@ -23,7 +29,16 @@ type Logging struct {
 	FileName string `yaml:"file_name"`
 }
 
-func Init(filename string) *Config {
+type Mongodb struct {
+	URL string `yaml:"url"`
+}
+
+func Init(filename string) {
+	loadConfigs(filename)
+	logConfigure()
+}
+
+func loadConfigs(filename string) {
 	c := Config{}
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -34,22 +49,37 @@ func Init(filename string) *Config {
 	if filename != "" {
 		viper.SetConfigFile(filename)
 		if err := viper.MergeInConfig(); err != nil {
-			logrus.Fatalf("loading configs file [%s] failed: %s", filename, err)
+			log.Fatal().Msgf("loading configs file [%s] failed: %s", filename, err)
 		} else {
-			logrus.Infof("configs file [%s] loaded successfully", filename)
+			log.Info().Msgf("configs file [%s] loaded successfully", filename)
 		}
 	} else {
-		logrus.Fatal("Config fil is not determined")
+		log.Fatal().Msg("Config fil is not determined")
 	}
 
 	err := viper.Unmarshal(&c, func(config *mapstructure.DecoderConfig) {
 		config.TagName = "yaml"
 	})
 	if err != nil {
-		logrus.Fatal("failed on configs unmarshal: ", err)
+		log.Fatal().Msg("failed on configs unmarshal: " + err.Error())
 	}
 
 	C = c
-	logrus.Debugf("Following configuration is loaded:\n%+v\n", c)
-	return &c
+	log.Info().Msgf("Following configuration is loaded:\n%+v\n", c)
+}
+
+func logConfigure() {
+	level, err := zerolog.ParseLevel(C.Logging.Level)
+	if err != nil {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	} else {
+		zerolog.SetGlobalLevel(level)
+	}
+	zerolog.TimeFieldFormat = time.RFC3339Nano
+	if C.Mode == "dev" {
+		log.Logger = log.With().Caller().Logger()
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+	} else {
+		log.Logger = log.Output(os.Stdout)
+	}
 }

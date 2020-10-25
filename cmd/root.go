@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"battleship/config"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
 )
 
 var rootCMD = &cobra.Command{
@@ -18,12 +18,12 @@ func init() {
 	rootCMD.PersistentFlags().StringVar(&configFilePath, "config", "resources/config.yml", "config file address")
 }
 
-func Configure(){
+func Configure() {
 	config.Init(configFilePath)
 }
 
 func Execute() {
 	if err := rootCMD.Execute(); err != nil {
-		logrus.Fatal(err)
+		log.Fatal().Err(err).Msg("")
 	}
 }

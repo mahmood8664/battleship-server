@@ -1,43 +1,35 @@
 package cmd
 
 import (
-	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
+	"battleship/db/mongodb"
+	"battleship/http"
+	"battleship/socket"
+	"context"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"net/http"
-	"battleship/config"
-	"battleship/di"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var startCMD = &cobra.Command{
 	Use:   "start",
 	Short: "start server",
 	Run: func(cmd *cobra.Command, args []string) {
-		startServer()
+		client := connectToMongo()
+		defer client.Close()
+		go http.StartHttpServer()
+		socket.StartSocketServer()
 	},
 }
 
-var (
-	checkHealth = di.CreateCheckHealthController()
-)
-
-func startServer() {
-	e := echo.New()
-	e.HideBanner = true
-	setMiddlewares(e)
-	setEndpoints(e)
-	e.Debug = config.C.Logging.Level == "debug"
-	httpConfig := &http.Server{
-		Addr: fmt.Sprintf(":%s", config.C.Port),
+func connectToMongo() *mongodb.Client {
+	//mongodb
+	client, err := mongodb.CreateMongoClient()
+	if err != nil {
+		log.Fatal().Err(err).Msg("")
 	}
-	logrus.Fatal(e.StartServer(httpConfig))
-}
-
-func setMiddlewares(e *echo.Echo) {
-
-}
-
-func setEndpoints(e *echo.Echo) {
-	e.GET("/", checkHealth.CheckHealth())
+	err = client.Client.Ping(context.TODO(), &readpref.ReadPref{})
+	if err != nil {
+		log.Fatal().Err(err).Msg("")
+	}
+	return client
 }

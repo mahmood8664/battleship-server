@@ -1,0 +1,325 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Battleship API",
+        "title": "Battleship API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Mahmoud AllamehAmiri",
+            "email": "m.allamehamiri@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/v1/game": {
+            "post": {
+                "description": "create a new battleship game instance",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Create game",
+                "parameters": [
+                    {
+                        "description": "Create Game Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateGameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Game successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateGameResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/game/join": {
+            "post": {
+                "description": "Join to a battleship game instance",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Join game",
+                "parameters": [
+                    {
+                        "description": "Join Game Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.JoinGameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Join Game successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.JoinGameResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/game/{game_id}": {
+            "get": {
+                "description": "Get game info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Get game",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "game_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Game successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GameDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user": {
+            "post": {
+                "description": "create a new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create user",
+                "parameters": [
+                    {
+                        "description": "Create User Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateUserResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/{user_id}": {
+            "get": {
+                "description": "Get user info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Game successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserDto"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.CreateGameRequest": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateGameResponse": {
+            "type": "object",
+            "properties": {
+                "game_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateUserRequest": {
+            "type": "object",
+            "properties": {
+                "mobile": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateUserResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GameDto": {
+            "type": "object",
+            "properties": {
+                "create_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_move_time": {
+                    "type": "string"
+                },
+                "move_timeout_sec": {
+                    "type": "integer"
+                },
+                "side_1_user_id": {
+                    "type": "string"
+                },
+                "side_2_user_id": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.GameState"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "turn": {
+                    "type": "integer"
+                },
+                "winner": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GameState": {
+            "type": "object",
+            "properties": {
+                "side_1": {
+                    "description": "map index -\u003e is hidden",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    }
+                },
+                "side_1_ships": {
+                    "description": "map index -\u003e is ship exist",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    }
+                },
+                "side_2": {
+                    "description": "map index -\u003e is hidden",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    }
+                },
+                "side_2_ships": {
+                    "description": "map index -\u003e is ship exist",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    }
+                }
+            }
+        },
+        "dto.JoinGameRequest": {
+            "type": "object",
+            "properties": {
+                "game_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.JoinGameResponse": {
+            "type": "object",
+            "properties": {
+                "game": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.GameDto"
+                }
+            }
+        },
+        "dto.UserDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "mobile": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
