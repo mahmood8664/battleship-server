@@ -8,7 +8,11 @@ package di
 import (
 	"battleship/controllers"
 	"battleship/db/dao"
+	"battleship/events"
+	"battleship/events/incoming_events"
+	"battleship/events/outgoing_events"
 	"battleship/service"
+	"battleship/socket"
 )
 
 // Injectors from wire.go:
@@ -28,7 +32,8 @@ func CreateUserController() controllers.UserController {
 func CreateGameService() service.GameService {
 	gameDao := CreateGameDao()
 	userDao := CreateUserDao()
-	gameServiceImpl := service.NewGameServiceImpl(gameDao, userDao)
+	outgoingEventHandler := CreateOutgoingEventHandler()
+	gameServiceImpl := service.NewGameServiceImpl(gameDao, userDao, outgoingEventHandler)
 	return gameServiceImpl
 }
 
@@ -36,6 +41,30 @@ func CreateUserService() service.UserService {
 	userDao := CreateUserDao()
 	userServiceImpl := service.NewUserServiceImpl(userDao)
 	return userServiceImpl
+}
+
+func CreateConnectionEventHandler() events.ConnectionEventHandler {
+	gameService := CreateGameService()
+	connectionEventHandlerImpl := events.NewConnectionEventHandlerImpl(gameService)
+	return connectionEventHandlerImpl
+}
+
+func CreateIncomingEventHandler() incoming_events.IncomingEventHandler {
+	gameService := CreateGameService()
+	incomingEventHandlerImpl := incoming_events.NewIncomingEventHandlerImpl(gameService)
+	return incomingEventHandlerImpl
+}
+
+func CreateOutgoingEventHandler() outgoing_events.OutgoingEventHandler {
+	outgoingEventHandlerImpl := outgoing_events.NewOutgoingEventHandlerImpl()
+	return outgoingEventHandlerImpl
+}
+
+func CreateSocketHandler() socket.SocketHandler {
+	connectionEventHandler := CreateConnectionEventHandler()
+	incomingEventHandler := CreateIncomingEventHandler()
+	socketHandlerImpl := socket.NewSocketHandlerImpl(connectionEventHandler, incomingEventHandler)
+	return socketHandlerImpl
 }
 
 func CreateGameDao() dao.GameDao {

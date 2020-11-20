@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"battleship/battle_error"
+	"battleship/dto"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -19,7 +19,7 @@ func LogMiddleware() echo.MiddlewareFunc {
 
 				start := time.Now()
 				if err = next(c); err != nil {
-					battle_error.CustomHTTPErrorHandler(err, c)
+					dto.CustomHTTPErrorHandler(err, c)
 				}
 				stop := time.Now()
 

@@ -1,6 +1,5 @@
 mode: dev
 http_port: 8080
-socket_port: 8090
 logging:
   level: debug
   path: /tmp/data

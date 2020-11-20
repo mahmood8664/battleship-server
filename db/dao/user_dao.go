@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"battleship/battle_error"
 	"battleship/db/mongodb"
+	"battleship/dto"
 	"battleship/model"
 	"context"
 	"github.com/rs/zerolog/log"
@@ -25,7 +25,7 @@ func (r *UserDaoImpl) GetOne(id string) (user model.User, err error) {
 	hex, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Warn().Str("userId", id).Err(err).Msg("cannot convert to ObjectId")
-		return user, battle_error.ParseError(err)
+		return user, dto.ParseError(err)
 	}
 
 	result := mongodb.DB.Client.Database(mongodb.BattleshipDb).Collection(mongodb.CollectionUser).FindOne(context.TODO(), model.User{Id: hex})
@@ -34,14 +34,14 @@ func (r *UserDaoImpl) GetOne(id string) (user model.User, err error) {
 	if err != nil {
 		log.Warn().Str("userId", id).Err(err).Msg("cannot decode user")
 	}
-	return user, battle_error.ParseError(err)
+	return user, dto.ParseError(err)
 }
 
 func (r *UserDaoImpl) Insert(user model.User) (id string, err error) {
 	one, err := mongodb.DB.Client.Database(mongodb.BattleshipDb).Collection(mongodb.CollectionUser).InsertOne(context.TODO(), user)
 	if err != nil {
 		log.Warn().Str("userId", id).Err(err).Msg("cannot insert user")
-		return "", battle_error.ParseError(err)
+		return "", dto.ParseError(err)
 	}
 	return one.InsertedID.(primitive.ObjectID).Hex(), nil
 }

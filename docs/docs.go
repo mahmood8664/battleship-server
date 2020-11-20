@@ -94,7 +94,75 @@ var doc = `{
                     "200": {
                         "description": "Join Game successfully",
                         "schema": {
-                            "$ref": "#/definitions/dto.JoinGameResponse"
+                            "$ref": "#/definitions/dto.GetGameResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/game/move-ship": {
+            "post": {
+                "description": "Move ship to new locaiton",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Move ship",
+                "parameters": [
+                    {
+                        "description": "Join Game Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.MoveShipRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Join Game successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetGameResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/game/submit-ships": {
+            "post": {
+                "description": "submit ship locations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "submit ship locations",
+                "parameters": [
+                    {
+                        "description": "Submit ships Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SubmitShipsLocationsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Submit ships successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetGameResponse"
                         }
                     }
                 }
@@ -126,7 +194,7 @@ var doc = `{
                     "200": {
                         "description": "Game successfully created",
                         "schema": {
-                            "$ref": "#/definitions/dto.GameDto"
+                            "$ref": "#/definitions/dto.GetGameResponse"
                         }
                     }
                 }
@@ -200,6 +268,23 @@ var doc = `{
         }
     },
     "definitions": {
+        "dto.BattleError": {
+            "type": "object",
+            "properties": {
+                "error_code": {
+                    "type": "integer"
+                },
+                "error_data": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "error_message": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateGameRequest": {
             "type": "object",
             "properties": {
@@ -211,8 +296,15 @@ var doc = `{
         "dto.CreateGameResponse": {
             "type": "object",
             "properties": {
+                "error": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.BattleError"
+                },
                 "game_id": {
                     "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
                 }
             }
         },
@@ -230,8 +322,15 @@ var doc = `{
         "dto.CreateUserResponse": {
             "type": "object",
             "properties": {
+                "error": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.BattleError"
+                },
                 "id": {
                     "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
                 }
             }
         },
@@ -304,6 +403,22 @@ var doc = `{
                 }
             }
         },
+        "dto.GetGameResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.BattleError"
+                },
+                "game": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.GameDto"
+                },
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
         "dto.JoinGameRequest": {
             "type": "object",
             "properties": {
@@ -315,18 +430,33 @@ var doc = `{
                 }
             }
         },
-        "dto.JoinGameResponse": {
+        "dto.MoveShipRequest": {
+            "type": "object"
+        },
+        "dto.SubmitShipsLocationsRequest": {
             "type": "object",
             "properties": {
-                "game": {
-                    "type": "object",
-                    "$ref": "#/definitions/dto.GameDto"
+                "game_id": {
+                    "type": "string"
+                },
+                "ships_indexes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
         "dto.UserDto": {
             "type": "object",
             "properties": {
+                "error": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.BattleError"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -335,6 +465,9 @@ var doc = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
                 }
             }
         }

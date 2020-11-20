@@ -1,18 +1,21 @@
 package socket
 
 import (
-	"battleship/config"
 	"battleship/dto"
-	"battleship/middlewares"
+	"battleship/events"
+	"battleship/events/incoming_events"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
-	"github.com/ziflex/lecho/v2"
 	"net/http"
 )
+
+//goland:noinspection GoNameStartsWithPackageName
+type SocketHandler interface {
+	CreateSocket(c echo.Context) error
+}
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -21,37 +24,59 @@ var upgrader = websocket.Upgrader{
 		fmt.Printf("%+v", r)
 		return true
 	},
-} // use default options
+}
 
-func StartSocketServer() {
-	e := echo.New()
-	e.HideBanner = true
-	setHttpMiddlewares(e)
-	e.Logger = lecho.From(log.Logger)
-	e.GET("/", func(c echo.Context) error {
-		return connect(c.Response(), c.Request())
-	})
+//goland:noinspection GoNameStartsWithPackageName
+type SocketHandlerImpl struct {
+	connectionEventHandler events.ConnectionEventHandler
+	incomingEventHandler   incoming_events.IncomingEventHandler
+}
 
-	httpConfig := &http.Server{
-		Addr: fmt.Sprintf(":%s", config.C.SocketPort),
+func NewSocketHandlerImpl(connectionHandler events.ConnectionEventHandler, incomingEventHandler incoming_events.IncomingEventHandler) *SocketHandlerImpl {
+	return &SocketHandlerImpl{
+		connectionEventHandler: connectionHandler,
+		incomingEventHandler:   incomingEventHandler,
 	}
-
-	log.Fatal().Err(e.StartServer(httpConfig)).Msg("")
 }
 
-func setHttpMiddlewares(e *echo.Echo) {
-	e.Use(middleware.BodyDump(middlewares.BodyDumper))
-	e.Use(middlewares.LogMiddleware())
+func (r *SocketHandlerImpl) CreateSocket(c echo.Context) error {
+	return r.connect(c)
 }
 
-func connect(w http.ResponseWriter, r *http.Request) error {
-	c, err := upgrader.Upgrade(w, r, nil)
+func (r *SocketHandlerImpl) connect(c echo.Context) error {
+	gameId := c.QueryParam("game_id")
+	userId := c.QueryParam("user_id")
+	if gameId == "" || userId == "" {
+		log.Error().Str("game_id", gameId).Str("user_id", userId).Msg("game_id or user_id is null in create socket")
+		return dto.BadRequest0()
+	}
+	socketConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		log.Error().Msg("error in upgrading:" + err.Error())
 		return err
 	}
+
+	request := new(dto.SocketConnect)
+	request.GameId = gameId
+	request.UserId = userId
+	marshal, err := json.Marshal(request)
+	if err != nil {
+		log.Error().Err(err).Msg("error in marshaling SocketConnect")
+		return err
+	}
+
+	event := dto.Event{
+		Type:    dto.Connect,
+		Payload: string(marshal),
+	}
+	err = r.connectionEventHandler.UserConnect(event, socketConn)
+	if err != nil {
+		log.Error().Err(err).Msg("error in NewConnectionHandler")
+		return err
+	}
+
 	for {
-		_, message, err := c.ReadMessage()
+		_, message, err := socketConn.ReadMessage()
 		if err != nil {
 			log.Warn().Msg("error in reading message:" + err.Error())
 			break
@@ -64,9 +89,9 @@ func connect(w http.ResponseWriter, r *http.Request) error {
 			//_ = c.Close()
 		}
 
-		err = handleEvents(*event, c)
+		err = r.incomingEventHandler.HandleEvent(*event)
 		if err != nil {
-			//_ = c.Close()
+			_ = socketConn.Close()
 		}
 
 		//err = c.WriteMessage(1, message)

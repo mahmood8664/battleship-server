@@ -16,11 +16,10 @@ var (
 )
 
 type Config struct {
-	Mode       string  `yaml:"mode"`
-	HttpPort   string  `yaml:"http_port"`
-	SocketPort string  `yaml:"socket_port"`
-	Logging    Logging `yaml:"logging"`
-	MongoDB    Mongodb `yaml:"mongodb"`
+	Mode     string  `yaml:"mode"`
+	HttpPort string  `yaml:"http_port"`
+	Logging  Logging `yaml:"logging"`
+	MongoDB  Mongodb `yaml:"mongodb"`
 }
 
 type Logging struct {

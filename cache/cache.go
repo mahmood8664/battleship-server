@@ -1,7 +1,7 @@
-package socket
+package cache
 
 import (
-	"battleship/battle_error"
+	"battleship/dto"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog/log"
@@ -9,11 +9,11 @@ import (
 )
 
 var GameCache = struct {
-	mux   sync.Locker
-	cache map[string]GameData
+	Mux   sync.Locker
+	Cache map[string]GameData
 }{
-	cache: make(map[string]GameData),
-	mux:   new(sync.Mutex),
+	Cache: make(map[string]GameData),
+	Mux:   new(sync.Mutex),
 }
 
 type GameData struct {
@@ -30,5 +30,5 @@ func (r *GameData) getUser(userId string) (string, error) {
 		return r.Side2UserId, nil
 	}
 	log.Error().Str("userId", userId).Msg("cannot find userId in GameData")
-	return "", battle_error.NotFoundError1(fmt.Sprintf("cannot find userId %s in GameData", userId))
+	return "", dto.NotFoundError1(fmt.Sprintf("cannot find userId %s in GameData", userId))
 }

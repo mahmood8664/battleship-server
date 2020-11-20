@@ -1,7 +1,8 @@
 package model
 
 import (
-	"battleship/battle_error"
+	"battleship/error_codes"
+	"battleship/utils"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
@@ -11,13 +12,12 @@ type GameStatus string
 
 const (
 	Init     GameStatus = "init"
-	Choose   GameStatus = "choose"
 	Start    GameStatus = "start"
 	Finished GameStatus = "finished"
 )
 
 type Game struct {
-	Id             primitive.ObjectID  `json:"-" bson:"_id,omitempty"`
+	Id             primitive.ObjectID  `bson:"_id,omitempty"`
 	State          GameState           `bson:"state,omitempty"`
 	Status         GameStatus          `bson:"status,omitempty"`
 	Side1          *primitive.ObjectID `bson:"side_1,omitempty"`
@@ -29,6 +29,10 @@ type Game struct {
 	Winner         *primitive.ObjectID `bson:"winner,omitempty"`
 }
 
+func (g *Game) GetMaskedGameId() string {
+	return utils.MaskId(g.Id.Hex())
+}
+
 func (g *Game) moveShipSide1(shipIndex int, locationIndex int) error {
 	if exist, ok := g.State.Side1Ships[shipIndex]; ok && exist {
 		if val, ok2 := g.State.Side1[locationIndex]; ok2 && val {
@@ -36,11 +40,11 @@ func (g *Game) moveShipSide1(shipIndex int, locationIndex int) error {
 			g.State.Side1Ships[locationIndex] = true
 		} else {
 			log.Debug().Str("gameId", g.Id.Hex()).Msg("cannot move ship to revealed location")
-			return battle_error.BadRequest2("cannot move ship to revealed location", battle_error.ShipInvalidMove)
+			return error_codes.ShipInvalidMoveRevealedLocation
 		}
 	} else {
 		log.Debug().Str("gameId", g.Id.Hex()).Msg("cannot move ship that is already destroyed")
-		return battle_error.BadRequest2("cannot move ship that is already destroyed", battle_error.ShipInvalidMove)
+		return error_codes.ShipInvalidMoveAlreadyDestroyed
 	}
 	return nil
 }
@@ -52,11 +56,11 @@ func (g *Game) moveShipSide2(shipIndex int, locationIndex int) error {
 			g.State.Side2Ships[locationIndex] = true
 		} else {
 			log.Debug().Str("gameId", g.Id.Hex()).Msg("cannot move ship to revealed location")
-			return battle_error.BadRequest2("cannot move ship to revealed location", battle_error.ShipInvalidMove)
+			return error_codes.ShipInvalidMoveRevealedLocation
 		}
 	} else {
 		log.Debug().Str("gameId", g.Id.Hex()).Msg("cannot move ship that is already destroyed")
-		return battle_error.BadRequest2("cannot move ship that is already destroyed", battle_error.ShipInvalidMove)
+		return error_codes.ShipInvalidMoveAlreadyDestroyed
 	}
 	return nil
 }

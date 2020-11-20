@@ -1,5 +1,7 @@
 package dto
 
+import "battleship/utils"
+
 const (
 	Connect SocketEventType = iota + 1
 )
@@ -14,4 +16,12 @@ type Event struct {
 type SocketConnect struct {
 	GameId string `json:"game_id"`
 	UserId string `json:"user_id"`
+}
+
+func (r *SocketConnect) GetUnMaskedGameId() string {
+	return utils.MaskId(r.GameId)
+}
+
+func (r *SocketConnect) GetUnMaskedUserId() string {
+	return utils.MaskId(r.GameId)
 }

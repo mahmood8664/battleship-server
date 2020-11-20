@@ -30,20 +30,28 @@ func StartHttpServer() {
 func setHttpMiddlewares(e *echo.Echo) {
 	e.Use(middleware.BodyDump(middlewares.BodyDumper))
 	e.Use(middlewares.LogMiddleware())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		//AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 }
 
 var (
 	gameController = di.CreateGameController()
 	userController = di.CreateUserController()
+	socketHandler  = di.CreateSocketHandler()
 )
 
 func setHttpEndpoints(e *echo.Echo) {
-	e.GET("/api/v1/check-health", controllers.CheckHealth())
-	e.GET("/api/v1/error", controllers.Error())
-	e.POST("/api/v1/game", gameController.CreateGame())
-	e.POST("/api/v1/game/join", gameController.JoinGame())
-	e.GET("/api/v1/game/:game_id", gameController.GetGame())
-	e.POST("/api/v1/user", userController.CreateUser())
-	e.GET("/api/v1/user/:user_id", userController.GetUser())
+	e.GET("/api/v1/check-health", controllers.CheckHealth)
+	e.GET("/api/v1/error", controllers.Error)
+	e.POST("/api/v1/game", gameController.CreateGame)
+	e.POST("/api/v1/game/join", gameController.JoinGame)
+	e.POST("/api/v1/game/submit-ships", gameController.SubmitShipsLocations)
+	e.PUT("/api/v1/game/move-ship", gameController.MoveShip)
+	e.GET("/api/v1/game/:game_id", gameController.GetGame)
+	e.POST("/api/v1/user", userController.CreateUser)
+	e.GET("/api/v1/user/:user_id", userController.GetUser)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	e.GET("/socket", socketHandler.CreateSocket)
 }

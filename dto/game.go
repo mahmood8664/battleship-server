@@ -2,6 +2,7 @@ package dto
 
 import (
 	"battleship/model"
+	"battleship/utils"
 	"time"
 )
 
@@ -9,7 +10,12 @@ type CreateGameRequest struct {
 	UserId string `json:"user_id,omitempty"`
 }
 
+func (r *CreateGameRequest) GetUnMaskedUserId() string {
+	return utils.MaskId(r.UserId)
+}
+
 type CreateGameResponse struct {
+	BaseResponse
 	GameId string `json:"game_id,omitempty"`
 }
 
@@ -20,15 +26,44 @@ type JoinGameRequest struct {
 	UserId string `json:"user_id"`
 }
 
-type JoinGameResponse struct {
-	Game *GameDto `json:"game"`
+func (r *JoinGameRequest) GetUnMaskedUserId() string {
+	return utils.MaskId(r.UserId)
+}
+
+func (r *JoinGameRequest) GetUnMaskedGameId() string {
+	return utils.MaskId(r.GameId)
 }
 
 ///////////////
+type SubmitShipsLocationsRequest struct {
+	UserId       string `json:"user_id"`
+	GameId       string `json:"game_id"`
+	ShipsIndexes []int  `json:"ships_indexes"`
+}
+
+func (r *SubmitShipsLocationsRequest) GetUnMaskedGameId() string {
+	return utils.MaskId(r.GameId)
+}
+
+func (r *SubmitShipsLocationsRequest) GetUnMaskedUserId() string {
+	return utils.MaskId(r.UserId)
+}
+
+//////////////
+
+type MoveShipRequest struct {
+}
+
+//////////////
+
+type GetGameResponse struct {
+	BaseResponse
+	Game *GameDto `json:"game"`
+}
 
 type GameDto struct {
 	Id             string           `json:"id,omitempty"`
-	State          GameState        `json:"state,omitempty"`
+	State          *GameState       `json:"state,omitempty"`
 	Status         model.GameStatus `json:"status,omitempty"`
 	Side1UserId    *string          `json:"side_1_user_id,omitempty"`
 	Side2UserId    *string          `json:"side_2_user_id,omitempty"`
@@ -40,7 +75,7 @@ type GameDto struct {
 }
 
 func (gameDto *GameDto) FromGame(game *model.Game) {
-	gameDto.Id = game.Id.Hex()
+	gameDto.Id = utils.MaskId(game.Id.Hex())
 	gameDto.Status = game.Status
 	gameDto.LastMoveTime = game.LastMoveTime
 	gameDto.Turn = game.Turn
@@ -58,7 +93,7 @@ func (gameDto *GameDto) FromGame(game *model.Game) {
 		hex := game.Side2.Hex()
 		gameDto.Side2UserId = &hex
 	}
-	gameDto.State = GameState{
+	gameDto.State = &GameState{
 		Side1:      game.State.Side1,
 		Side2:      game.State.Side2,
 		Side1Ships: game.State.Side1Ships,

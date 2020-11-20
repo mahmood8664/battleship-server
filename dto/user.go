@@ -1,6 +1,7 @@
 package dto
 
 type UserDto struct {
+	BaseResponse
 	Id     string  `json:"id,omitempty"`
 	Name   *string `json:"name,omitempty"`
 	Mobile *string `json:"mobile,omitempty"`
@@ -12,5 +13,6 @@ type CreateUserRequest struct {
 }
 
 type CreateUserResponse struct {
+	BaseResponse
 	Id string `json:"id,omitempty"`
 }

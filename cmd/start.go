@@ -3,7 +3,6 @@ package cmd
 import (
 	"battleship/db/mongodb"
 	"battleship/http"
-	"battleship/socket"
 	"context"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -16,8 +15,8 @@ var startCMD = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client := connectToMongo()
 		defer client.Close()
-		go http.StartHttpServer()
-		socket.StartSocketServer()
+		http.StartHttpServer()
+		//socket.StartSocketServer()
 	},
 }
 

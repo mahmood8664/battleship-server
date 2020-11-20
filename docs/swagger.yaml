@@ -1,4 +1,15 @@
 definitions:
+  dto.BattleError:
+    properties:
+      error_code:
+        type: integer
+      error_data:
+        additionalProperties:
+          type: string
+        type: object
+      error_message:
+        type: string
+    type: object
   dto.CreateGameRequest:
     properties:
       user_id:
@@ -6,8 +17,13 @@ definitions:
     type: object
   dto.CreateGameResponse:
     properties:
+      error:
+        $ref: '#/definitions/dto.BattleError'
+        type: object
       game_id:
         type: string
+      ok:
+        type: boolean
     type: object
   dto.CreateUserRequest:
     properties:
@@ -18,8 +34,13 @@ definitions:
     type: object
   dto.CreateUserResponse:
     properties:
+      error:
+        $ref: '#/definitions/dto.BattleError'
+        type: object
       id:
         type: string
+      ok:
+        type: boolean
     type: object
   dto.GameDto:
     properties:
@@ -68,6 +89,17 @@ definitions:
         description: map index -> is ship exist
         type: object
     type: object
+  dto.GetGameResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.BattleError'
+        type: object
+      game:
+        $ref: '#/definitions/dto.GameDto'
+        type: object
+      ok:
+        type: boolean
+    type: object
   dto.JoinGameRequest:
     properties:
       game_id:
@@ -75,20 +107,32 @@ definitions:
       user_id:
         type: string
     type: object
-  dto.JoinGameResponse:
+  dto.MoveShipRequest:
+    type: object
+  dto.SubmitShipsLocationsRequest:
     properties:
-      game:
-        $ref: '#/definitions/dto.GameDto'
-        type: object
+      game_id:
+        type: string
+      ships_indexes:
+        items:
+          type: integer
+        type: array
+      user_id:
+        type: string
     type: object
   dto.UserDto:
     properties:
+      error:
+        $ref: '#/definitions/dto.BattleError'
+        type: object
       id:
         type: string
       mobile:
         type: string
       name:
         type: string
+      ok:
+        type: boolean
     type: object
 info:
   contact:
@@ -141,7 +185,7 @@ paths:
         "200":
           description: Game successfully created
           schema:
-            $ref: '#/definitions/dto.GameDto'
+            $ref: '#/definitions/dto.GetGameResponse'
       summary: Get game
       tags:
       - Game
@@ -163,8 +207,52 @@ paths:
         "200":
           description: Join Game successfully
           schema:
-            $ref: '#/definitions/dto.JoinGameResponse'
+            $ref: '#/definitions/dto.GetGameResponse'
       summary: Join game
+      tags:
+      - Game
+  /api/v1/game/move-ship:
+    post:
+      consumes:
+      - application/json
+      description: Move ship to new locaiton
+      parameters:
+      - description: Join Game Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MoveShipRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Join Game successfully
+          schema:
+            $ref: '#/definitions/dto.GetGameResponse'
+      summary: Move ship
+      tags:
+      - Game
+  /api/v1/game/submit-ships:
+    post:
+      consumes:
+      - application/json
+      description: submit ship locations
+      parameters:
+      - description: Submit ships Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SubmitShipsLocationsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Submit ships successfully
+          schema:
+            $ref: '#/definitions/dto.GetGameResponse'
+      summary: submit ship locations
       tags:
       - Game
   /api/v1/user:
