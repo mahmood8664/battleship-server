@@ -1,9 +1,8 @@
 package incoming_events
 
 import (
+	"battleship/db/dao"
 	"battleship/dto"
-	"battleship/service"
-	"github.com/rs/zerolog/log"
 )
 
 type IncomingEventHandler interface {
@@ -11,19 +10,15 @@ type IncomingEventHandler interface {
 }
 
 type IncomingEventHandlerImpl struct {
-	gameService service.GameService
+	gameDao dao.GameDao
 }
 
-func NewIncomingEventHandlerImpl(gameService service.GameService) *IncomingEventHandlerImpl {
-	return &IncomingEventHandlerImpl{
-		gameService: gameService,
+func NewIncomingEventHandlerImpl(gameDao dao.GameDao) IncomingEventHandlerImpl {
+	return IncomingEventHandlerImpl{
+		gameDao: gameDao,
 	}
 }
 
-func (r *IncomingEventHandlerImpl) HandleEvent(event dto.Event) error {
-	switch event.Type {
-	case dto.Connect:
-		log.Error().Msg("Connect event is not allowed here")
-	}
+func (r IncomingEventHandlerImpl) HandleEvent(event dto.Event) error {
 	return nil
 }

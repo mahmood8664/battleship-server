@@ -2,8 +2,8 @@ package socket
 
 import (
 	"battleship/dto"
-	"battleship/events"
 	"battleship/events/incoming_events"
+	"battleship/service"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
@@ -28,22 +28,22 @@ var upgrader = websocket.Upgrader{
 
 //goland:noinspection GoNameStartsWithPackageName
 type SocketHandlerImpl struct {
-	connectionEventHandler events.ConnectionEventHandler
-	incomingEventHandler   incoming_events.IncomingEventHandler
+	incomingEventHandler incoming_events.IncomingEventHandler
+	gameService          service.GameService
 }
 
-func NewSocketHandlerImpl(connectionHandler events.ConnectionEventHandler, incomingEventHandler incoming_events.IncomingEventHandler) *SocketHandlerImpl {
-	return &SocketHandlerImpl{
-		connectionEventHandler: connectionHandler,
-		incomingEventHandler:   incomingEventHandler,
+func NewSocketHandlerImpl(incomingEventHandler incoming_events.IncomingEventHandler, gameService service.GameService) SocketHandlerImpl {
+	return SocketHandlerImpl{
+		incomingEventHandler: incomingEventHandler,
+		gameService:          gameService,
 	}
 }
 
-func (r *SocketHandlerImpl) CreateSocket(c echo.Context) error {
+func (r SocketHandlerImpl) CreateSocket(c echo.Context) error {
 	return r.connect(c)
 }
 
-func (r *SocketHandlerImpl) connect(c echo.Context) error {
+func (r SocketHandlerImpl) connect(c echo.Context) error {
 	gameId := c.QueryParam("game_id")
 	userId := c.QueryParam("user_id")
 	if gameId == "" || userId == "" {
@@ -56,12 +56,12 @@ func (r *SocketHandlerImpl) connect(c echo.Context) error {
 		return err
 	}
 
-	request := new(dto.SocketConnect)
+	request := new(dto.UserConnectEvent)
 	request.GameId = gameId
 	request.UserId = userId
 	marshal, err := json.Marshal(request)
 	if err != nil {
-		log.Error().Err(err).Msg("error in marshaling SocketConnect")
+		log.Error().Err(err).Msg("error in marshaling UserConnectEvent")
 		return err
 	}
 
@@ -69,7 +69,7 @@ func (r *SocketHandlerImpl) connect(c echo.Context) error {
 		Type:    dto.Connect,
 		Payload: string(marshal),
 	}
-	err = r.connectionEventHandler.UserConnect(event, socketConn)
+	err = r.gameService.SocketConnect(event, socketConn)
 	if err != nil {
 		log.Error().Err(err).Msg("error in NewConnectionHandler")
 		return err
@@ -93,12 +93,6 @@ func (r *SocketHandlerImpl) connect(c echo.Context) error {
 		if err != nil {
 			_ = socketConn.Close()
 		}
-
-		//err = c.WriteMessage(1, message)
-		//if err != nil {
-		//	log.Warn().Msg("write:" + err.Error())
-		//	break
-		//}
 	}
 	return nil
 }

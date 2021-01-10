@@ -18,8 +18,8 @@ type UserControllerImpl struct {
 	userService service.UserService
 }
 
-func NewUserController(userService service.UserService) *UserControllerImpl {
-	return &UserControllerImpl{
+func NewUserController(userService service.UserService) UserControllerImpl {
+	return UserControllerImpl{
 		userService: userService,
 	}
 }
@@ -31,9 +31,9 @@ func NewUserController(userService service.UserService) *UserControllerImpl {
 // @Accept json
 // @Produce json
 // @Param request body dto.CreateUserRequest true "Create User Request"
-// @Success 200 {object} dto.CreateUserResponse "User successfully created"
+// @Success 200 {object} dto.CreateUserResponse "Create User Response"
 // @Router /api/v1/user [post]
-func (r *UserControllerImpl) CreateUser(ctx echo.Context) error {
+func (r UserControllerImpl) CreateUser(ctx echo.Context) error {
 	request := new(dto.CreateUserRequest)
 	if err := ctx.Bind(request); err != nil {
 		log.Warn().Err(err).Msg("Bad request")
@@ -55,9 +55,9 @@ func (r *UserControllerImpl) CreateUser(ctx echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param user_id path string true " "
-// @Success 200 {object} dto.UserDto "Game successfully created"
+// @Success 200 {object} dto.UserDto "UserDto"
 // @Router /api/v1/user/{user_id} [get]
-func (r *UserControllerImpl) GetUser(ctx echo.Context) error {
+func (r UserControllerImpl) GetUser(ctx echo.Context) error {
 	userId := ctx.Param("user_id")
 	if userId == "" {
 		log.Warn().Msg("Bad request")

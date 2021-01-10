@@ -8,7 +8,6 @@ package di
 import (
 	"battleship/controllers"
 	"battleship/db/dao"
-	"battleship/events"
 	"battleship/events/incoming_events"
 	"battleship/events/outgoing_events"
 	"battleship/service"
@@ -32,8 +31,9 @@ func CreateUserController() controllers.UserController {
 func CreateGameService() service.GameService {
 	gameDao := CreateGameDao()
 	userDao := CreateUserDao()
+	gameEventDao := CreateGameEventDao()
 	outgoingEventHandler := CreateOutgoingEventHandler()
-	gameServiceImpl := service.NewGameServiceImpl(gameDao, userDao, outgoingEventHandler)
+	gameServiceImpl := service.NewGameServiceImpl(gameDao, userDao, gameEventDao, outgoingEventHandler)
 	return gameServiceImpl
 }
 
@@ -43,15 +43,9 @@ func CreateUserService() service.UserService {
 	return userServiceImpl
 }
 
-func CreateConnectionEventHandler() events.ConnectionEventHandler {
-	gameService := CreateGameService()
-	connectionEventHandlerImpl := events.NewConnectionEventHandlerImpl(gameService)
-	return connectionEventHandlerImpl
-}
-
 func CreateIncomingEventHandler() incoming_events.IncomingEventHandler {
-	gameService := CreateGameService()
-	incomingEventHandlerImpl := incoming_events.NewIncomingEventHandlerImpl(gameService)
+	gameDao := CreateGameDao()
+	incomingEventHandlerImpl := incoming_events.NewIncomingEventHandlerImpl(gameDao)
 	return incomingEventHandlerImpl
 }
 
@@ -61,9 +55,9 @@ func CreateOutgoingEventHandler() outgoing_events.OutgoingEventHandler {
 }
 
 func CreateSocketHandler() socket.SocketHandler {
-	connectionEventHandler := CreateConnectionEventHandler()
 	incomingEventHandler := CreateIncomingEventHandler()
-	socketHandlerImpl := socket.NewSocketHandlerImpl(connectionEventHandler, incomingEventHandler)
+	gameService := CreateGameService()
+	socketHandlerImpl := socket.NewSocketHandlerImpl(incomingEventHandler, gameService)
 	return socketHandlerImpl
 }
 
@@ -75,4 +69,9 @@ func CreateGameDao() dao.GameDao {
 func CreateUserDao() dao.UserDao {
 	userDaoImpl := dao.NewUserDaoImpl()
 	return userDaoImpl
+}
+
+func CreateGameEventDao() dao.GameEventDao {
+	gameEventDaoImpl := dao.NewEventGameDaoImpl()
+	return gameEventDaoImpl
 }

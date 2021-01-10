@@ -32,3 +32,15 @@ func MaskId(id string) string {
 	return string(bytes)
 
 }
+
+////////////////////////////
+
+func GetMapKeySlice(myMap map[int]bool) []int {
+	keys := make([]int, len(myMap))
+	i := 0
+	for k := range myMap {
+		keys[i] = k
+		i++
+	}
+	return keys
+}

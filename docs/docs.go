@@ -58,9 +58,77 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Game successfully created",
+                        "description": "Create Game Response",
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateGameResponse"
+                            "$ref": "#/definitions/dto.GetGameResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/game/change-turn": {
+            "post": {
+                "description": "Change turn",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Change turn",
+                "parameters": [
+                    {
+                        "description": "Change Turn Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ChangeTurnRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Change Turn Response",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ChangeTurnResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/game/explode": {
+            "post": {
+                "description": "Explode a slot",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Explode a slot",
+                "parameters": [
+                    {
+                        "description": "Explode request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ExplodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Explode Response",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ExplodeResponse"
                         }
                     }
                 }
@@ -92,7 +160,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Join Game successfully",
+                        "description": "Get Game response",
                         "schema": {
                             "$ref": "#/definitions/dto.GetGameResponse"
                         }
@@ -102,7 +170,7 @@ var doc = `{
         },
         "/api/v1/game/move-ship": {
             "post": {
-                "description": "Move ship to new locaiton",
+                "description": "Move ship to new location",
                 "consumes": [
                     "application/json"
                 ],
@@ -115,7 +183,7 @@ var doc = `{
                 "summary": "Move ship",
                 "parameters": [
                     {
-                        "description": "Join Game Request",
+                        "description": "Move Ship Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -126,9 +194,43 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Join Game successfully",
+                        "description": "Move Ship Response",
                         "schema": {
-                            "$ref": "#/definitions/dto.GetGameResponse"
+                            "$ref": "#/definitions/dto.MoveShipResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/game/reveal": {
+            "post": {
+                "description": "Reveal enemy fields",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Reveal enemy fields",
+                "parameters": [
+                    {
+                        "description": "Reveal enemy fields request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RevealEnemyFieldsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reveal Enemy Fields Response",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RevealEnemyFieldsResponse"
                         }
                     }
                 }
@@ -160,9 +262,9 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Submit ships successfully",
+                        "description": "Submit Ships Locations Response",
                         "schema": {
-                            "$ref": "#/definitions/dto.GetGameResponse"
+                            "$ref": "#/definitions/dto.SubmitShipsLocationsResponse"
                         }
                     }
                 }
@@ -184,15 +286,22 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": " ",
+                        "description": "Game Id",
                         "name": "game_id",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User Id",
+                        "name": "user_id",
+                        "in": "query",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Game successfully created",
+                        "description": "Get Game Response",
                         "schema": {
                             "$ref": "#/definitions/dto.GetGameResponse"
                         }
@@ -226,7 +335,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "User successfully created",
+                        "description": "Create User Response",
                         "schema": {
                             "$ref": "#/definitions/dto.CreateUserResponse"
                         }
@@ -258,7 +367,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Game successfully created",
+                        "description": "UserDto",
                         "schema": {
                             "$ref": "#/definitions/dto.UserDto"
                         }
@@ -285,26 +394,37 @@ var doc = `{
                 }
             }
         },
-        "dto.CreateGameRequest": {
+        "dto.ChangeTurnRequest": {
             "type": "object",
             "properties": {
+                "game_id": {
+                    "type": "string"
+                },
                 "user_id": {
                     "type": "string"
                 }
             }
         },
-        "dto.CreateGameResponse": {
+        "dto.ChangeTurnResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "object",
                     "$ref": "#/definitions/dto.BattleError"
                 },
-                "game_id": {
-                    "type": "string"
-                },
                 "ok": {
                     "type": "boolean"
+                }
+            }
+        },
+        "dto.CreateGameRequest": {
+            "type": "object",
+            "properties": {
+                "move_timeout": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -334,6 +454,35 @@ var doc = `{
                 }
             }
         },
+        "dto.ExplodeRequest": {
+            "type": "object",
+            "properties": {
+                "game_id": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ExplodeResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.BattleError"
+                },
+                "has_ship": {
+                    "type": "boolean"
+                },
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
         "dto.GameDto": {
             "type": "object",
             "properties": {
@@ -343,17 +492,11 @@ var doc = `{
                 "id": {
                     "type": "string"
                 },
-                "last_move_time": {
-                    "type": "string"
-                },
                 "move_timeout_sec": {
                     "type": "integer"
                 },
-                "side_1_user_id": {
-                    "type": "string"
-                },
-                "side_2_user_id": {
-                    "type": "string"
+                "other_side_joined": {
+                    "type": "boolean"
                 },
                 "state": {
                     "type": "object",
@@ -362,40 +505,39 @@ var doc = `{
                 "status": {
                     "type": "string"
                 },
-                "turn": {
-                    "type": "integer"
-                },
-                "winner": {
+                "user_id": {
                     "type": "string"
+                },
+                "winner_user": {
+                    "type": "string"
+                },
+                "your_turn": {
+                    "type": "boolean"
                 }
             }
         },
         "dto.GameState": {
             "type": "object",
             "properties": {
-                "side_1": {
-                    "description": "map index -\u003e is hidden",
+                "enemy_ground": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "boolean"
                     }
                 },
-                "side_1_ships": {
-                    "description": "map index -\u003e is ship exist",
+                "enemy_revealed_ships": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "boolean"
                     }
                 },
-                "side_2": {
-                    "description": "map index -\u003e is hidden",
+                "own_ground": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "boolean"
                     }
                 },
-                "side_2_ships": {
-                    "description": "map index -\u003e is ship exist",
+                "own_ships": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "boolean"
@@ -431,7 +573,65 @@ var doc = `{
             }
         },
         "dto.MoveShipRequest": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "game_id": {
+                    "type": "string"
+                },
+                "new_ship_index": {
+                    "type": "integer"
+                },
+                "old_ship_index": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.MoveShipResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.BattleError"
+                },
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.RevealEnemyFieldsRequest": {
+            "type": "object",
+            "properties": {
+                "game_id": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RevealEnemyFieldsResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.BattleError"
+                },
+                "ok": {
+                    "type": "boolean"
+                },
+                "revealed_ship_indexes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "dto.SubmitShipsLocationsRequest": {
             "type": "object",
@@ -447,6 +647,24 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.SubmitShipsLocationsResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "$ref": "#/definitions/dto.BattleError"
+                },
+                "game_status": {
+                    "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
+                },
+                "turn": {
+                    "type": "integer"
                 }
             }
         },

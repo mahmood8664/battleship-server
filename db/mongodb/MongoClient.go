@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	BattleshipDb   = "battleship"
-	CollectionGame = "game"
-	CollectionUser = "user"
+	BattleshipDb        = "battleship"
+	CollectionGame      = "game"
+	CollectionGameEvent = "game_event"
+	CollectionUser      = "user"
 )
 
 var (
@@ -25,7 +26,12 @@ type Client struct {
 }
 
 func CreateMongoClient() (*Client, error) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(config.C.MongoDB.URL))
+	client, err := mongo.NewClient(options.Client().
+		ApplyURI(config.C.MongoDB.URL).
+		SetAuth(options.Credential{
+			Username: config.C.MongoDB.Username,
+			Password: config.C.MongoDB.Password,
+		}))
 	if err != nil {
 		log.Fatal().Err(err).Msg("")
 	}

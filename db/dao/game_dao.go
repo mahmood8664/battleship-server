@@ -11,19 +11,19 @@ import (
 )
 
 type GameDao interface {
-	Insert(game *model.Game) (id string, err error)
-	GetOne(gameId string) (game *model.Game, err error)
-	Update(game *model.Game) error
+	Insert(game model.Game) (id string, err error)
+	GetOne(gameId string) (game model.Game, err error)
+	Update(game model.Game) error
 }
 
 type GameDaoImpl struct {
 }
 
-func NewGameDaoImpl() *GameDaoImpl {
-	return &GameDaoImpl{}
+func NewGameDaoImpl() GameDaoImpl {
+	return GameDaoImpl{}
 }
 
-func (r *GameDaoImpl) Insert(game *model.Game) (id string, err error) {
+func (r GameDaoImpl) Insert(game model.Game) (id string, err error) {
 	one, err := mongodb.DB.Client.Database(mongodb.BattleshipDb).Collection(mongodb.CollectionGame).InsertOne(context.TODO(), game)
 	if err != nil {
 		log.Warn().Str("gameId", game.Id.Hex()).Err(err).Msg("cannot insert Game")
@@ -32,7 +32,7 @@ func (r *GameDaoImpl) Insert(game *model.Game) (id string, err error) {
 	return one.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-func (r *GameDaoImpl) Update(game *model.Game) error {
+func (r GameDaoImpl) Update(game model.Game) error {
 	res, err := mongodb.DB.Client.Database(mongodb.BattleshipDb).Collection(mongodb.CollectionGame).
 		UpdateOne(context.TODO(), bson.M{"_id": game.Id}, bson.D{{"$set", game}})
 	if err != nil {
@@ -44,7 +44,7 @@ func (r *GameDaoImpl) Update(game *model.Game) error {
 	return nil
 }
 
-func (r *GameDaoImpl) GetOne(gameId string) (game *model.Game, err error) {
+func (r GameDaoImpl) GetOne(gameId string) (game model.Game, err error) {
 	hex, err := primitive.ObjectIDFromHex(gameId)
 	if err != nil {
 		log.Warn().Str("gameId", gameId).Err(err).Msg("cannot convert to objectId")

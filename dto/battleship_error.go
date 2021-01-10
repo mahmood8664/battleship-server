@@ -63,6 +63,8 @@ func parseErrorMessage(err error) error {
 		return BadRequest2(err.Error(), error_codes.ShipInvalidMove)
 	case err.Error() == error_codes.ShipInvalidMoveAlreadyDestroyed.Error():
 		return BadRequest2(err.Error(), error_codes.ShipInvalidMove)
+	case err.Error() == error_codes.NotUserTurn.Error():
+		return Forbidden2(err.Error(), error_codes.ShipInvalidMove)
 	case strings.HasPrefix(err.Error(), "encoding/hex:"):
 		return BadRequest1("Invalid id")
 	default:
@@ -119,11 +121,18 @@ func Unauthorized(message string) error {
 	}
 }
 
-func Forbidden(message string, errorCode error_codes.ErrorCode) error {
+func Forbidden1(message string) error {
 	return &BattleError{
 		HttpErrorCode: http.StatusForbidden,
-		ErrorCode:     errorCode,
 		ErrorMessage:  message,
+	}
+}
+
+func Forbidden2(message string, code error_codes.ErrorCode) error {
+	return &BattleError{
+		HttpErrorCode: http.StatusForbidden,
+		ErrorMessage:  message,
+		ErrorCode:     code,
 	}
 }
 

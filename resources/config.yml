@@ -6,5 +6,5 @@ logging:
   file_name: battleship.log
 mongodb:
   url: mongodb://localhost:27017
-  username:
-  password:
+  username: mongo
+  password: 123456

@@ -17,13 +17,13 @@ type UserServiceImpl struct {
 	userDao dao.UserDao
 }
 
-func NewUserServiceImpl(userDao dao.UserDao) *UserServiceImpl {
-	return &UserServiceImpl{
+func NewUserServiceImpl(userDao dao.UserDao) UserServiceImpl {
+	return UserServiceImpl{
 		userDao: userDao,
 	}
 }
 
-func (r *UserServiceImpl) CreateUser(request dto.CreateUserRequest) (response dto.CreateUserResponse, err error) {
+func (r UserServiceImpl) CreateUser(request dto.CreateUserRequest) (response dto.CreateUserResponse, err error) {
 	id, err := r.userDao.Insert(model.User{
 		Name:   request.Name,
 		Mobile: request.Mobile,
@@ -37,7 +37,7 @@ func (r *UserServiceImpl) CreateUser(request dto.CreateUserRequest) (response dt
 	return response, err
 }
 
-func (r *UserServiceImpl) GetUser(id string) (user dto.UserDto, err error) {
+func (r UserServiceImpl) GetUser(id string) (user dto.UserDto, err error) {
 	u, err := r.userDao.GetOne(id)
 	if err == nil {
 		user.Mobile = u.Mobile

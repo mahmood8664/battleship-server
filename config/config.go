@@ -29,7 +29,9 @@ type Logging struct {
 }
 
 type Mongodb struct {
-	URL string `yaml:"url"`
+	URL      string `yaml:"url"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
 }
 
 func Init(filename string) {
