@@ -515,6 +515,14 @@ func (r GameServiceImpl) Explode(request dto.ExplodeRequest) (response dto.Explo
 		response.HasShip = game.ExplodeSide1(request.Index)
 	}
 
+	if response.HasShip {
+		if game.Turn == 1 {
+			game.Turn = 2
+		} else {
+			game.Turn = 1
+		}
+	}
+
 	err = r.PersistExplosionEvent(game.Id, userId, request.Index, !response.HasShip)
 	if err != nil {
 		log.Error().Msg("cannot save explosion event")
