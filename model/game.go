@@ -88,24 +88,28 @@ func (g *Game) RevealSlotSide2(index int) (notEmptySlots []int) {
 }
 
 func (g *Game) ExplodeSide1(index int) bool {
+	g.State.Side1Ground[index] = false
 	if g.State.Side1Ships[index] {
 		g.State.Side1Ships[index] = false
 		if allShipsDestroyed(g.State.Side1Ships) {
 			g.Status = Finished
 			g.WinnerUser = g.Side2User
 		}
+		g.State.Side1RevealedShips[index] = false
 		return true
 	}
 	return false
 }
 
 func (g *Game) ExplodeSide2(index int) bool {
+	g.State.Side2Ground[index] = false
 	if g.State.Side2Ships[index] {
 		g.State.Side2Ships[index] = false
 		if allShipsDestroyed(g.State.Side2Ships) {
 			g.Status = Finished
 			g.WinnerUser = g.Side1User
 		}
+		g.State.Side2RevealedShips[index] = false
 		return true
 	}
 	return false
