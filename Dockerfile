@@ -3,4 +3,5 @@ WORKDIR /src
 COPY . .
 RUN go build -o /out/example .
 FROM scratch AS bin
-COPY --from=build /out/example /
+COPY --from=build /app /
+CMD ["./battleship", "start"]
