@@ -16,7 +16,6 @@ var startCMD = &cobra.Command{
 		client := connectToMongo()
 		defer client.Close()
 		http.StartHttpServer()
-		//socket.StartSocketServer()
 	},
 }
 
