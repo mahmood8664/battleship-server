@@ -10,5 +10,5 @@ FROM alpine:3.12
 RUN mkdir /app
 WORKDIR /app
 COPY --from=build /out /app
-EXPOSE 9090
+EXPOSE 8080
 CMD ["./battleship", "start"]
