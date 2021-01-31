@@ -20,6 +20,7 @@ type Config struct {
 	HttpPort string  `yaml:"http_port"`
 	Logging  Logging `yaml:"logging"`
 	MongoDB  Mongodb `yaml:"mongodb"`
+	Cors     Cors    `yaml:"cors"`
 }
 
 type Logging struct {
@@ -32,6 +33,10 @@ type Mongodb struct {
 	URL      string `yaml:"url"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+}
+
+type Cors struct {
+	Domain string `yaml:"domain"`
 }
 
 func Init(filename string) {

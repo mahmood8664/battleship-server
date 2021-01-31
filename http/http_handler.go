@@ -30,10 +30,19 @@ func StartHttpServer() {
 func setHttpMiddlewares(e *echo.Echo) {
 	e.Use(middleware.BodyDump(middlewares.BodyDumper))
 	e.Use(middlewares.LogMiddleware())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		//AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	}))
+	if config.C.Mode == "dev" {
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"http://192.168.1.118:9000"},
+			MaxAge:       86400,
+			AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "cache-control"},
+		}))
+	} else {
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{config.C.Cors.Domain},
+			MaxAge:       86400,
+			AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "cache-control"},
+		}))
+	}
 }
 
 var (

@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"battleship/config"
 	"battleship/dto"
 	"battleship/events/incoming_events"
 	"battleship/service"
@@ -22,7 +23,15 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		fmt.Printf("%+v", r)
-		return true
+		if config.C.Mode == "dev" {
+			return true
+		} else {
+			if r.Header.Get("Origin") == config.C.Cors.Domain {
+				return true
+			} else {
+				return false
+			}
+		}
 	},
 }
 
