@@ -82,10 +82,10 @@ func logConfigure() {
 		zerolog.SetGlobalLevel(level)
 	}
 	zerolog.TimeFieldFormat = time.RFC3339Nano
-	if C.Mode == "dev" {
-		log.Logger = log.With().Caller().Logger()
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
-	} else {
-		log.Logger = log.Output(os.Stdout)
-	}
+	//if C.Mode == "dev" {
+	log.Logger = log.With().Caller().Logger()
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+	//} else {
+	//	log.Logger = log.Output(os.Stdout)
+	//}
 }

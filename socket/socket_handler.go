@@ -23,14 +23,14 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		fmt.Printf("%+v", r)
-		if config.C.Mode == "dev" {
-			return true
-		} else {
+		if config.C.Cors.Domain != "*" {
 			if r.Header.Get("Origin") == config.C.Cors.Domain {
 				return true
 			} else {
 				return false
 			}
+		} else {
+			return true
 		}
 	},
 }
