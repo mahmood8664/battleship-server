@@ -9,3 +9,5 @@ docker build -t battleship-server .
 To run Docker image run: 
 
 docker run --name battleship-server -e BATTLESHIP_MONGODB_URL=mongodb://mongo:27017 -e BATTLESHIP_MONGODB_USERNAME=mongo -e BATTLESHIP_MONGODB_PASSWORD=123456 --network battleship --restart always -d battleship-server
+
+You can play this game at: http://battleship.mamiri.me/
