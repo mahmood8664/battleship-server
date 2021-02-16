@@ -5,7 +5,7 @@ logging:
   path: /tmp/data
   file_name: battleship.log
 cors:
-  domain: "https://battleship.mamiri.me"
+  domain: "https://mamiri.me"
 mongodb:
   url: mongodb://localhost:27017
   username: mongo
